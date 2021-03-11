@@ -1,1 +1,1 @@
-nim compile --run main.nim
+nim compile -d:ssl --run main.nim
