@@ -4,32 +4,32 @@ import json
 var host = "https://dojomaze-api.maas.codes/evaluate/"
 
 type
-    KeyStatusResponse = object
-        currentKeyNumber: int
-        expiresUtc: string
-        maxNumberOfEntries: int
-        maxLineLength: int
-        playersJoined: seq[string]
-        winners: seq[string]
+    KeyStatusResponse* = object
+        currentKeyNumber*: int
+        expiresUtc*: string
+        maxNumberOfEntries*: int
+        maxLineLength*: int
+        playersJoined*: seq[string]
+        winners*: seq[string]
 
-    PlayerJoinRequest = object
-        clientId: string
-        playerName: string
+    PlayerJoinRequest* = object
+        clientId*: string
+        playerName*: string
 
-    PlayerJoinResponse = object
-        playerId: string
+    PlayerJoinResponse* = object
+        playerId*: string
 
-    EvaluateRequest = object
-        playerId: string
-        entries: seq[Entry]
+    EvaluateRequest* = object
+        playerId*: string
+        entries*: seq[Entry]
 
-    EvaluateResponse = object
-        entries: seq[Entry]
+    EvaluateResponse* = object
+        entries*: seq[Entry]
 
-    Entry = object
-        line: string
-        number: int
-        score: float
+    Entry* = object
+        line*: string
+        number*: int
+        score*: float
 
 proc httpGetString(url: string): string =
     var client = newHttpClient()
@@ -47,14 +47,14 @@ proc httpPostJson[T](url: string, request: T): JsonNode =
     let responseStr = response.body()
     return parseJson(responseStr)
 
-proc httpGetKeyStatus(): KeyStatusResponse =
+proc httpGetKeyStatus*(): KeyStatusResponse =
     return to(httpGetJson("status"), KeyStatusResponse)
     
-proc httpGetLegalCharacters(): string =
+proc httpGetLegalCharacters*(): string =
     return httpGetString("characters")
 
-proc httpPostPlayerJoin(request: PlayerJoinRequest): PlayerJoinResponse =
+proc httpPostPlayerJoin*(request: PlayerJoinRequest): PlayerJoinResponse =
     return to(httpPostJson("join", request), PlayerJoinResponse)
 
-proc httpPostEvaluate(request: EvaluateRequest): EvaluateResponse = 
+proc httpPostEvaluate*(request: EvaluateRequest): EvaluateResponse =
     return to(httpPostJson("run", request), EvaluateResponse)
