@@ -1,4 +1,4 @@
-include api
+import api
 import random
 
 randomize()
