@@ -31,6 +31,17 @@ type
         number*: int
         score*: float
 
+    DecorateRequest* = object
+        clientId*: string
+        teamInfo*: TeamInfo
+
+    TeamInfo* = object
+        teamName*: string
+        iconUrl*: string
+        teamMembers*: string
+        repositoryUrl*: string
+        codingChallenges*: seq[string]
+
 proc httpGetString(url: string): string =
     var client = newHttpClient()
     return client.getContent(host & url)
@@ -47,14 +58,23 @@ proc httpPostJson[T](url: string, request: T): JsonNode =
     let responseStr = response.body()
     return parseJson(responseStr)
 
+proc httpPostOnlyJson[T](url: string, request: T): void = 
+    let client = newHttpClient()
+    client.headers = newHttpHeaders({ "Content-Type": "application/json" })
+    let body = %*request
+    discard client.request(host & url, httpMethod = HttpPost, body = $body)
+    
 proc httpGetKeyStatus*(): KeyStatusResponse =
-    return to(httpGetJson("status"), KeyStatusResponse)
+    return to(httpGetJson("evaluate/status"), KeyStatusResponse)
     
 proc httpGetLegalCharacters*(): string =
-    return httpGetString("characters")
+    return httpGetString("evaluate/characters")
 
 proc httpPostPlayerJoin*(request: PlayerJoinRequest): PlayerJoinResponse =
-    return to(httpPostJson("join", request), PlayerJoinResponse)
+    return to(httpPostJson("evaluate/join", request), PlayerJoinResponse)
 
 proc httpPostEvaluate*(request: EvaluateRequest): EvaluateResponse =
-    return to(httpPostJson("run", request), EvaluateResponse)
+    return to(httpPostJson("evaluate/run", request), EvaluateResponse)
+
+proc httpPostDecorate*(request: DecorateRequest): void =
+    httpPostOnlyJson("dashboard/decorate", request)
